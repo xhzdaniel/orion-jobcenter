@@ -1,6 +1,6 @@
-local QBCore = exports['qb-core']:GetCoreObject()
+local QBCore = Framework:Get()
 local PlayerData = QBCore.Functions.GetPlayerData()
-local isLoggedIn = LocalPlayer.state.isLoggedIn
+local isLoggedIn = QBCore.Functions.IsPlayerLoaded()
 local playerPed = PlayerPedId()
 local playerCoords = GetEntityCoords(playerPed)
 local closestJobCenter = nil
@@ -114,9 +114,9 @@ local function spawnPeds()
                     if isLoggedIn and closestJobCenter then
                         if inside then
                             inRangeJobCenter = true
-                            exports['qb-core']:DrawText(Config.Translate['open'])
+                            Custom.DrawText(Config.Translate.open)
                         else
-                            exports['qb-core']:HideText()
+                            Custom.HideText(Config.Translate.open)
                             inRangeJobCenter = false
                         end
                     end
@@ -137,7 +137,7 @@ end
 
 -- Events
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    PlayerData = QBCore.Functions.GetPlayerData()
+    PlayerData = Framework:Get().PlayerData
     isLoggedIn = true
     spawnPeds()
 end)
@@ -148,8 +148,25 @@ RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     deletePeds()
 end)
 
+RegisterNetEvent('esx:playerLoaded', function()
+    PlayerData = Framework:Get().PlayerData
+    isLoggedIn = true
+    spawnPeds()
+end)
+
+RegisterNetEvent('esx:playerDropped', function()
+    PlayerData = {}
+    isLoggedIn = false
+    deletePeds()
+end)
+
+
 RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
-    PlayerData = val
+    PlayerData = Framework:Get().PlayerData
+end)
+
+RegisterNetEvent('esx:setPlayerData', function()
+    PlayerData = Framework:Get().PlayerData
 end)
 
 AddEventHandler('onResourceStop', function(resource)
@@ -162,7 +179,9 @@ end)
 
 RegisterNUICallback('close', function(_, cb)
     setJobCenterPageState(false, false)
-    if inRangeJobCenter then exports['qb-core']:DrawText(Config.Translate['open']) end -- Reopen interaction when you're still inside the zone
+    if inRangeJobCenter then 
+        Custom.DrawText(Config.Translate['open']) 
+    end -- Reopen interaction when you're still inside the zone
     cb('ok')
 end)
 
@@ -205,9 +224,9 @@ CreateThread(function()
                     sleep = 0
                     if IsControlJustPressed(0, 38) then
                         setJobCenterPageState(true, true)
-                        exports['qb-core']:KeyPressed()
+                        Custom.KeyPressed()
                         Wait(500)
-                        exports['qb-core']:HideText()
+                        Custom.HideText()
                         sleep = 1000
                     end
                 end

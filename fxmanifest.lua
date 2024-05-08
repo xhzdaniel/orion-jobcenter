@@ -17,13 +17,19 @@ shared_scripts {
 }
 
 server_scripts {
-    'server/main.lua'
+    'custom/shared.lua',
+    'custom/server/*.lua',
+    'server/framework.lua',
+    'server/*.lua'
 }
 
 client_scripts {
     '@PolyZone/client.lua',
     '@PolyZone/BoxZone.lua',
-    'client/main.lua'
+    'custom/shared.lua',
+    'custom/client/*.lua',
+    'client/framework.lua',
+    'client/*.lua',
 }
 
 files {
